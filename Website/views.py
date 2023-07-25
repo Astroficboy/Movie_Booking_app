@@ -204,9 +204,13 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET'])
 def home():
+    movies = [{
+        "title" : "Oppenheimer",
+        "title" : "Barbie"
+    }]
     user = User.query.filter_by().first()
     admin = Admin.query.filter_by().first()
-    return render_template('movies.html', user=user, admin=admin)
+    return render_template('movies.html', user=user, admin=admin, movies=movies)
 
 @views.route('/bookings', methods=['GET'])
 # @login_required

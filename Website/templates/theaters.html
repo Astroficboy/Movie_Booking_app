@@ -1,3 +1,20 @@
 {% extends 'base_admin.html' %} 
 
-{%}
+{% block content %}
+<p>
+<div class="row">
+<div class="col"></div>
+<div class="col">
+    {% if admin.is_authenticated %}
+    <p>
+    <button type="button" class="btn btn-success">Add new theater</button>
+    <button type="button" class="btn btn-danger">Remove theater</button>
+    </p>
+    {% endif %}
+</div>
+<div class="col"></div>
+
+</div>
+</p>
+<script type="text/javascript" src="E:\Data science\IITM\App Dev 2\Project\from scratch\Website\Static\Components\theaters.js"></script>
+{% endblock %}

@@ -1,26 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %} 
-
-<div id="app">[[ message ]]</div>
-
-<script>
-  const { createApp, ref } = Vue
-
-  const app = createApp({
-    setup() {
-      const message = ref('Hello vue!')
-      return {
-        message
-      }
-    }
-  })
-
-  app.config.compilerOptions = {
-    delimiters: ["[[", "]]"]
-  }
-
-  app.mount("#app")
-</script>
+<!-- <deck-stat v-else v-for="deck in deck_stats" :deck="deck"></deck-stat> -->
+<ul class="group-list" id="movies">
+    <movies></movies> 
+</ul>
 
 {% endblock %}
