@@ -11,7 +11,6 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    admin = Admin.query.filter_by().first()
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -25,7 +24,7 @@ def login():
                 flash('Incorrect password.', category = 'error')
         else:
             flash('Email does not exists.', category = 'error')
-    return render_template('login.html', user = current_user, admin=admin)
+    return render_template('login.html', user = current_user)
 
 
 @auth.route('/logout')
@@ -37,7 +36,6 @@ def logout():
 
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
-    admin = Admin.query.filter_by().first()
     if request.method == 'POST':
         email = request.form.get('email')
         first_name = request.form.get('firstName')
@@ -57,11 +55,11 @@ def sign_up():
         elif len(password1) < 7:
             flash('Passeword must be at least 7 characters.', category = 'error')
         else: 
-            new_user = User(email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1, method = 'sha256'))
+            new_user = User(email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1, method = 'sha256'), role='normal')
             db.session.add(new_user)
             db.session.commit()
-            login_user(new_user, remember = True)
+            login_user(new_user)
             flash('Account created.', category = 'success')
             return redirect(url_for('views.home'))
 
-    return render_template('sign_up.html', user = current_user, admin=admin)
+    return render_template('sign_up.html', user = current_user)

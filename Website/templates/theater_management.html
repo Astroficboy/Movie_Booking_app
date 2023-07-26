@@ -1,0 +1,31 @@
+{% extends 'base_admin.html' %} 
+{% block title %}Theater Management{% endblock %}
+
+{% block content %}
+{% if admin.is_authenticated %}
+
+<div id="theater_management"></div>
+    <p></p>
+    <form class="form-floating", method="POST" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col"></div>
+            <div class="col">
+                <label for="name">Theater name</label>
+                <input class="form-control" id="name" name="name" placeholder="PVR Cinemas">
+                <label for="address">Address</label>
+                <input class="form-control" id="address" name="address" placeholder="Baner">
+                <label for="capacity">Capacity</label>
+                <input class="form-control" id="capacity" name="capacity" placeholder="300">
+                <label for="screens">Screens</label>
+                <input class="form-control" id="screens" name="screens" placeholder="300">
+                <label for="image">Image</label>
+                <input type="file" class="form-control" id="image" name="image" placeholder="300">
+                <br>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endif %}
+<script type="text/javascript" src="{{ url_for('static', filename='components/admin_dashboard.js') }}"></script>
+{% endblock %}
