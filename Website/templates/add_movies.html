@@ -1,0 +1,14 @@
+{% extends 'base_admin.html' %}
+{% block content %}
+
+<div class="row">
+    <div class="col"></div>
+    <div class="col">
+        <div id="movie_card">
+            <add-movie></add-movie>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='components/movies.js') }}"></script>
+{% endblock %}

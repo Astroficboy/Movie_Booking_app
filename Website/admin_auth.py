@@ -32,7 +32,7 @@ def login():
     return render_template('admin_login.html', admin = current_user)
 
 
-@admin_auth.route('/logout')
+@admin_auth.route('/admin_logout')
 @login_required
 def logout(): 
     logout_user()
@@ -40,9 +40,12 @@ def logout():
 
 @admin_auth.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    admin = Admin.query.filter_by(id=current_user.id).first()
-    admin_theater = Theaters.query.filter_by(admin_id=admin.id).first()
-    return render_template('admin_dashboard.html', admin=admin)
+    if current_user:
+        admin = Admin.query.filter_by(id=current_user.id).first()
+        admin_theater = Theaters.query.filter_by(admin_id=admin.id).first()
+        return render_template('admin_dashboard.html', admin=admin, admin_theater=admin_theater)
+    else:
+        return redirect(url_for('admin_auth.admin_login'))
 
 @admin_auth.route('/theater_management', methods=['GET','POST'])
 def theater_management():
@@ -60,10 +63,11 @@ def theater_management():
             new_theater = Theaters(name=name, address=address, capacity=capacity, screens=screens, image=image)
             db.session.add(new_theater)
             db.session.commit()
+            db.session.close()
             flash('Theater added', category='success')
             return(redirect(url_for('admin_auth.admin_dashboard')))
-    
-    return render_template('theater_management.html', admin=admin, admin_id=admin.id)
+    theater = Theaters.query.filter_by().first()
+    return render_template('theater_management.html', admin=admin, admin_id=admin.id, theater=theater)
 
 
 @admin_auth.route('/summary', methods=['GET'])

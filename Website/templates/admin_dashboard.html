@@ -2,14 +2,11 @@
 
 {% block content %}
 
-<div class="row">
-    <div class="col"></div>
-    <div class="col">
-        <p></p>
-        <div>
-            
-        </div>
-    </div>
-</div>
-
+{% if theater %}
+{% for theater in theater %}
+<showTheater></showTheater>
+<button type="button" class="btn btn-primary" href="/add_movies"></button>
+{% endfor %}
+{% endif %}
+<script src="{{ url_for('static', filename='components/movies.js')}}""></script>
 {% endblock %}

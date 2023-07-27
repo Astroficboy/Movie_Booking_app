@@ -66,13 +66,12 @@ class showListing(db.Model):
     tags = db.Column(db.String(100))
     director = db.Column(db.String(100))
     price = db.Column(db.Integer)
-    start_date = db.Column(db.DateTime(timezone=True), default=func.now())
-    end_date = db.Column(db.DateTime(timezone=True), default=func.now())
-    theater_id = db.Column(db.Integer, db.ForeignKey(Theaters.id))
-    screen_no = db.Column(db.Integer, db.ForeignKey(Theaters.screens))
+    theater_name = db.Column(db.String)
+    screen_no = db.Column(db.Integer)
     rating = db.Column(db.Integer)
     number_of_bookings = db.Column(db.Integer)
     number_of_theaters = db.Column(db.Integer)
+    image = db.Column(db.BLOB)
 
 
 

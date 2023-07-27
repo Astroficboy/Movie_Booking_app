@@ -2,34 +2,14 @@
 
 {% block content %}
 <div id="movie_card">
-    <div class="row">
-        <div v-for="movie in movies">
-            <div class="col">
-                <p></p>
-                <div class="card" style="width: 10rem; " :class="{ rate: movie.rating > 4 }">
-                    <img :src="movie.img" :alt="movie.title" class="card-img-top">
-                    <div class="card-body">
-                        <div id="showName"><strong>{[ movie.title ]}</strong></div>
-                        <div id="director">Directed by: {[ movie.director ]}</div> 
-                        <div id="rating">Rating: {[ movie.rating ]}</div>
-                        <div id="price">Price</div>
-                        
-                        <p></p>
-                        <a href="/bookings"><button type="button" class="btn btn-primary">Book Tickets</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% if movies %}
+    {% for movie in movies %}
+    <show-movie></show-movie>
+    {% endfor %}
+    {% else %}
+    <img src="../assets/img4.jpeg" alt="Currently there's no movie listed." width="auto" height="auto" style="vertical-align:bottom;">
+    {% endif %}
 </div>
 
-<script src="{{ url_for('static', filename='components/movies.js')}}""></script>
-<style>
-    div.rate{
-        background-color: beige;
-    }
-    div.movie_card{
-        display: flex;
-    }
-</style>
+<script src="{{ url_for('static', filename='components/movies.js') }}"></script>
 {% endblock %}
