@@ -21,43 +21,34 @@ def super_login():
         if super_user:
             if check_password_hash(super_user.password, password):
                 flash('Logged in successfully!', category = 'success')
-                login_user(super_user, remember=True)
+                login_user(super_user)
                 return redirect(url_for('super_auth.admin_registration', super_value=super_obj))
             else:
                 flash('Incorrect password.', category = 'error')
         else:
-            
             flash('Email does not exists.', category = 'error')
     return render_template('super_login.html', super_value=super_obj)
 
 
-@super_auth.route('/logout')
+@super_auth.route('/super_logout')
 @login_required
 def logout(): 
     logout_user()
     return redirect(url_for('views.home'))
 
 
-def get_role():
-    if current_user.is_authenticated and current_user.role == 'super':
+def super_get_role():
+    if current_user.role == 'super':
         return 'super'
     else:
         return redirect(url_for('super_auth.super_login'))
-    
-# def super_required(f):
-#     def decorated_function():
-#         if not current_user.is_authenticated or current_user.role != 'super':
-#             flash('You are not authorized to access this page.', 'error')
-#             return redirect(url_for('super_auth.super_login'))
-#         return f
-#     return decorated_function()
     
 
 @super_auth.route('/admin_registration', methods=['GET', 'POST'])
 # @super_required
 def admin_registration():
-    super = Super.query.filter_by().first()
-    if get_role() == 'super':
+    role = super_get_role()
+    if role == 'super':
         if request.method == 'POST':
             email = request.form.get('email')
             first_name = request.form.get('firstName')
@@ -76,12 +67,12 @@ def admin_registration():
             elif len(password1) < 7:
                 flash('Passeword must be at least 7 characters.', category = 'error')
             else: 
-                new_admin = Admin(email=email, first_name=first_name, last_name=last_name, password=generate_password_hash(password1, method = 'sha256'), role='admin')
+                new_admin = Admin(email=email.lower(), first_name=first_name.capitalize(), last_name=last_name.capitalize(), password=generate_password_hash(password1, method = 'sha256'), role='admin')
                 db.session.add(new_admin)
                 db.session.commit()
                 login_user(new_admin)
                 flash('Account created.', category = 'success')
                 return redirect(url_for('admin_auth.admin_dashboard'))
-    else:
-        return redirect(url_for('super_auth.super_login'))
+    # else:
+    #     return redirect(url_for('super_auth.super_login'))
     return render_template('register_admin.html', admin = current_user, super_value=current_user)

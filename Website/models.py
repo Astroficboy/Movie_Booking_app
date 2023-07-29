@@ -37,6 +37,7 @@ class Bookings(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey(User.id))
     created_on = db.Column(db.DateTime(timezone=True), default=func.now())
     number_of_seats = db.Column(db.Integer)
+    total_amount = db.Column(db.Integer)
 
 # class T(db.Model):
 #     id = db.Column(db.Integer, primary_key=True)
@@ -58,6 +59,7 @@ class Theaters(db.Model):
     screens = db.Column(db.Integer)
     image = db.Column(db.BLOB)
     admin_id = db.Column(db.Integer, db.ForeignKey(Admin.id))
+    total_business = db.Column(db.Integer)
     
 class showListing(db.Model):
     __tablenane__='showlistings'

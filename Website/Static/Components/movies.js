@@ -1,57 +1,49 @@
-const movie = Vue.createApp({
-    delimiters: ["{[", "]}"],
-    compilerOptions: {
-        isCustomElement: (tag) => ['add-movie', 'show-movie'].includes(tag)
-    }
-});
-
-movie.component('show-movie',{
-    template:`
-    <div class="row">
-        <div>
-            <div class="col">
-                <p></p>
-                <div class="card" style="width: 10rem; " :class="{ rate: movie.rating > 4 }">
-                    <img :src="movie.img" :alt="movie.title" class="card-img-top">
-                    <div class="card-body">
-                        <div id="showName"><strong>{[ movie.title ]}</strong></div>
-                        <div id="director">Directed by: {[ movie.director ]}</div> 
-                        <div id="rating">Rating: {[ movie.rating ]}</div>
-                        <div id="price">Price</div>
-                        <p></p>
-                        <a href="/bookings"><button type="button" class="btn btn-primary">Book Tickets</button></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>`
-});
-
-movie.component('add-movie',{
-    template:`
-    <p></p>
-    <form class="form-floating", method="POST" enctype="multipart/form-data">
+  Vue.component('add-movie', {
+    template: `
+    <div class="container mt-5 shadow-lg p-4 rounded">
+    <h2 class="mb-4">Add Movie</h2>
+    <form class="form-floating" method="POST" enctype="multipart/form-data">
         <div class="row">
-        <div class="col"></div>
             <div class="col">
-                <label for="show_name">Movie name</label>
-                <input class="form-control" id="show_name" name="show_name" placeholder="Oppenheimer">
-                <label for="tags">Tags</label>
-                <input class="form-control" id="tags" name="tags" placeholder="Baner">
-                <label for="director">Director</label>
-                <input class="form-control" id="director" name="director" placeholder="300">
-                <label for="theater_name">Theater Name</label>
-                <input class="form-control" id="theater_name" name="theater_name" placeholder="300">
-                <label for="screen_no">Screens</label>
-                <input class="form-control" id="screen_no" name="screen_no" placeholder="300">
-                <label for="image">Image</label>
-                <input type="file" class="form-control" id="image" name="image" placeholder="300">
+                <div class="form-group">
+                    <label for="show_name">Movie Name</label>
+                    <input class="form-control" id="show_name" name="show_name" placeholder="Oppenheimer">
+                </div>
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input class="form-control" id="tags" name="tags" placeholder="Drama">
+                </div>
+                <div class="form-group">
+                    <label for="director">Director</label>
+                    <input class="form-control" id="director" name="director" placeholder="Christopher Nolan">
+                </div>
+                <div class="form-group">
+                    <label for="theater_name">Theater Name</label>
+                    <input class="form-control" id="theater_name" name="theater_name" placeholder="PVR Cinemas">
+                </div>
+                <div class="form-group">
+                    <label for="screen_no">Screen Number</label>
+                    <input class="form-control" id="screen_no" name="screen_no" placeholder="5">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input class="form-control" id="price" name="price" placeholder="300">
+                </div>
+                <div class="form-group">
+                    <label for="image">Movie Poster</label>
+                    <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                </div>
                 <br>
                 <button type="submit" class="btn btn-primary">Submit</button>
             </div>
         </div>
-    </form>`
-})
+    </form>
+</div>
 
-movie.mount('#movie_card');
 
+    `
+  });
+  
+  const movieApp = new Vue({
+    el: "#movie_card",
+    })

@@ -47,7 +47,7 @@ def create_app():
 
     @login_manager.user_loader
     def load_user(id):
-        return User.query.get(id) or Super.query.get(id)
+        return User.query.get(id) or Super.query.get(id) or Admin.query.get(id)
     return app
 
 

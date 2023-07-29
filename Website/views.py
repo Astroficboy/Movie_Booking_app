@@ -1,50 +1,40 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
-from .models import User, Admin, showListing
+from .models import User, Admin, showListing, Theaters, Bookings
 import os
 from . import db
+import base64
+from sqlalchemy import inspect
 
 views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET'])
 def home():
-    user = User.query.filter_by().first()
-    admin = Admin.query.filter_by().first()
-    movies = showListing.query.filter_by().first()
+    user = User.query.first()
+    movies = showListing.query.all()
     return render_template('movies.html', user=current_user, movies=movies)
 
-@views.route('/add_movies', methods=['GET', 'POST'])
-def add_movies():
-    admin = Admin.query.filter_by().first()
-    if admin.is_authenticated:
-        admin = Admin.query.filter_by(id=admin.id).first()
-    else:
-        return redirect(url_for('admin_auth.admin_login'))
-    if request.method == 'POST':
-        show_name = request.form.get('show_name')
-        tags = request.form.get('tags')
-        director = request.form.get('director')
-        price = request.form.get('price')
-        screen_no = request.form.get('screen_no')
-        theater_name = request.form.get('theater_name')
-        image = request.files['image']
-        image = image.read()
-        new_movie = showListing(show_name=show_name, tags=tags, director=director, theater_name=theater_name,
-                                image=image, price=price, screen_no=screen_no)
-        db.session.add(new_movie)
-        db.session.commit()
-        db.session.close()
-    return render_template('add_movies.html', admin=admin)
 
-@views.route('/bookings', methods=['GET'])
+@views.route('/bookings', methods=['GET', 'POST'])
 def booking():
-    user = User.query.filter_by().first()
-    showName = request.form.get('showName')
-    rating = request.form.get('rating')
-    director = request.form.get('director')
-    price = request.form.get('price')
-        
-    return render_template('booking.html', user=current_user)
+    movie_id = request.args.get('movie_id')
+    movies = showListing.query.filter_by(id=movie_id).first()
+    if request.method=='POST':
+        movie_id = request.args.get('movie_id')
+        user_id = request.args.get("user_id")
+        seats = request.form.get('seats')
+        movies = showListing.query.filter_by(id=movie_id).first()
+        new_booking = Bookings(show_listing_id=movie_id, user_id=user_id, number_of_seats=seats, total_amount=((int(seats)*movies.price)))
+        theater = Theaters.query.filter_by(name=movies.theater_name).first()
+        if theater.total_business:
+            theater.total_business += (int(seats)*movies.price)
+        else:
+            theater.total_business = 0
+            theater.total_business += (int(seats)*movies.price)
+        db.session.add(new_booking)
+        db.session.commit()
+        return redirect(url_for('views.home'))
+    return render_template('booking.html', user=current_user, movies=movies)
 
 
 

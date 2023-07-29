@@ -1,12 +1,64 @@
 {% extends 'base_admin.html' %}
-
+{% block title %}Admin Dashboard{% endblock %}
 {% block content %}
 
-{% if theater %}
-{% for theater in theater %}
-<showTheater></showTheater>
-<button type="button" class="btn btn-primary" href="/add_movies"></button>
-{% endfor %}
+{% if admin_theater %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Active Bookings</h5>
+                    <p class="card-text">Total Active Bookings: <span id="activeBookings">0</span></p>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h5 class="card-title">Theaters Showing Movies</h5>
+                    <p class="card-text">Total Theaters: <span id="totalTheaters">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        {% for theater in admin_theater %}
+        <div class="col-md-4 mb-4" id="theater_management">
+            <div class="card h-100 shadow">
+                <img src="data:image/jpeg;base64,{{ theater_image }}" alt= "{{ theater.name }}"  class="card-img-top">
+                <div class="card-body" >
+                    <h5 class="card-title">{{ theater.name }}</h5>
+                    <p class="card-text">Address: {{ theater.address }}</p>
+                    <p class="card-text">Screens: {{ theater.screens }}</p>
+                    <p class="card-text">Capacity: {{ theater.capacity }}</p>
+                    <a href="{{ url_for('admin_auth.add_movies', theater_id=theater.id) }}" class="btn btn-primary">Add Movies</a>
+                    <a href="{{ url_for ('admin_auth.get_edit_form', theater_id=theater.id) }}"></button><button type="button" class="btn btn-secondary mt-2">Edit</button></a>
+                    <a href="{{ url_for ('admin_auth.delete_theater', theater_name=theater.name) }}"><button type="button" class="btn btn-secondary mt-2">Delete</button></a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endif %}
-<script src="{{ url_for('static', filename='components/movies.js')}}""></script>
+
+<script src="{{ url_for('static', filename='components/theater_management.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // Simulated data for the number of active bookings and theaters showing movies
+    const activeBookingsCount = 10;
+    const theatersCount = {{ admin_theater|length }};
+    
+    // Update the active bookings and theaters count
+    document.getElementById('activeBookings').innerText = activeBookingsCount;
+    document.getElementById('totalTheaters').innerText = theatersCount;
+</script>
+
+
+
+<!-- <script src="{{ url_for('static', filename='components/movies.js')}}""></script> -->
 {% endblock %}

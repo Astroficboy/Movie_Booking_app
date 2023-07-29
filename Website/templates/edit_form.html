@@ -1,0 +1,9 @@
+{% extends 'base_admin.html' %}
+
+ {% block content %}
+        <div id="theater_management">
+            <edit-theater></edit-theater>
+        </div>
+
+<script src="{{ url_for('static', filename='components/theater_management.js') }}" defer></script>
+ {% endblock %}

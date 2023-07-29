@@ -2,78 +2,163 @@
 {% block title %}Sign-up{% endblock %}
 
 {% block content %}
-<form method="POST">
-    <h3 align="center">Sign up</h3>
-    <div class="row"><p>
+<div class="container">
+    <form method="POST">
+        <h3 align="center">Sign Up</h3>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="firstName">First Name</label>
+                    <input 
+                        type="text"
+                        class="form-control"
+                        id="firstName"
+                        name="firstName"
+                        placeholder="Enter first name"
+                        required
+                    />
+                </div>
+            </div>
 
-    </p></div>
-    <div class="row">
-        <div class="col"></div>
-        <div class="col"></div>
-        <div class="col">
-            <div class="form-group">
-                <label for="firstName">First Name</label>  
-                <input 
-                    type="text"  
-                    class="form-control" 
-                    id="firstName" 
-                    name="firstName" 
-                    placeholder="Enter first name"
-                />
+            <div class="col">
+                <div class="form-group">
+                    <label for="lastName">Last Name</label>
+                    <input 
+                        type="text"
+                        class="form-control"
+                        id="lastName"
+                        name="lastName"
+                        placeholder="Enter last name"
+                        required
+                    />
+                </div>
             </div>
         </div>
 
-        <div class="col">
-            <div class="form-group">
-                <label for="lastName">Last Name</label>  
-                <input 
-                    type="text"  
-                    class="form-control" 
-                    id="firstName" 
-                    name="firstName" 
-                    placeholder="Enter first name"
-                />
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <div class="col"></div>
-        <div class="col">
-            <div class="form-group">
-                <label for="email">Email address</label>  
-                <input 
-                    type="email"  
-                    class="form-control" 
-                    id="email" 
-                    name="email" 
-                    placeholder="Enter email"
-                />
-            </div>
+        <div class="row">
+            <div class="col">
+                <div class="form-group">
+                    <label for="email">Email address</label>
+                    <input 
+                        type="email"
+                        class="form-control"
+                        id="email"
+                        name="email"
+                        placeholder="Enter email"
+                        required
+                    />
+                </div>
 
-            <div class="form-group">
-                <label for="password1">Password</label>  
-                <input 
-                    type="password"  
-                    class="form-control"
-                    id="password1" 
-                    name="password1" 
-                    placeholder="Enter password"
-                />
+                <div class="form-group">
+                    <label for="password1">Password</label>
+                    <input 
+                        type="password"
+                        class="form-control"
+                        id="password1"
+                        name="password1"
+                        placeholder="Enter password"
+                        required
+                        minlength="7"/>
+                    
+                </div>
+                <div class="form-group">
+                    <label for="password2">Password (Confirm)</label>
+                    <input 
+                        type="password"
+                        class="form-control"
+                        id="password2"
+                        name="password2"
+                        placeholder="Confirm password"
+                        required
+                    />
+                </div>
+                <div id="passwordStrength">Password Strength: <span></span></div>
+                <br/>
+                <button type="submit" class="btn btn-primary">Submit</button>
             </div>
-            <div class="form-group">
-                <label for="password2">Password (Confirm)</label>  
-                <input 
-                    type="password"  
-                    class="form-control" 
-                    id="password2" 
-                    name="password2" 
-                    placeholder="Confirm password"
-                />
-            </div>
-            <br/>
-            <button type="submit" class="btn btn-primary">Submit</button>
         </div>
-    </div>
-</form>
+    </form>
+</div>
+
+
+<style>
+    .container {
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+        max-width: 500px;
+        margin: 0 auto;
+        margin-top: 50px;
+    }
+
+    #passwordStrength {
+        margin-top: 5px;
+        font-size: 12px;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    const passwordInput = document.getElementById('password1');
+    const passwordStrength = document.querySelector('#passwordStrength span');
+
+    passwordInput.addEventListener('input', updatePasswordStrength);
+
+    function updatePasswordStrength() {
+        const password = passwordInput.value;
+        const strength = calculatePasswordStrength(password);
+        passwordStrength.textContent = getStrengthText(strength);
+    }
+
+    function calculatePasswordStrength(password) {
+        const length = password.length;
+        if (length < 6) {
+            return 0; // Very weak
+        } else if (length < 8) {
+            return 1; // Weak
+        } else if (length < 10) {
+            return 2; // Medium
+        } else if (length < 12) {
+            return 3; // Strong
+        } else {
+            const hasLowerCase = /[a-z]/.test(password);
+            const hasUpperCase = /[A-Z]/.test(password);
+            const hasNumber = /[0-9]/.test(password);
+            const hasSpecialCharacter = /[!@#$%^&*]/.test(password);
+
+            if (hasLowerCase && hasUpperCase && hasNumber && hasSpecialCharacter) {
+                return 4; // Very strong
+            } else {
+                return 3; // Strong 
+            }
+        }
+    };
+    document.getElementById('password1').addEventListener('input', function() {
+        const password = this.value;
+        const strengthIndicator = document.getElementById('passwordStrength').querySelector('span');
+        const strength = calculatePasswordStrength(password);
+        
+        switch (strength) {
+            case 0:
+                strengthIndicator.textContent = 'Very Weak';
+                break;
+            case 1:
+                strengthIndicator.textContent = 'Weak';
+                break;
+            case 2:
+                strengthIndicator.textContent = 'Medium';
+                break;
+            case 3:
+                strengthIndicator.textContent = 'Strong';
+                break;
+            case 4:
+                strengthIndicator.textContent = 'Very Strong';
+                break;
+            default:
+                strengthIndicator.textContent = '';
+                break;
+        }
+    });
+</script>
 {% endblock %}

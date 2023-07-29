@@ -1,0 +1,15 @@
+<!-- Display the list of theaters -->
+{% extends 'base_admin.html' %}
+{% block title %}Delete theater{% endblock %}
+
+
+{% block content %}
+<div class="theater_management">
+    <h3>{{ theater.name }}</h3>
+    <p>Address: {{ theater.address }}</p>
+    <form method="post">
+        <button type="submit" class="btn btn-danger">Delete Theater</button>
+    </form>
+</div>
+<script src="{{ url_for('static', filename='Components/theater_management.js') }}" defer></script>
+{% endblock %}
