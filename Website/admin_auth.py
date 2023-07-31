@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
-from .models import Admin, Theaters, showListing
+from .models import Admin, Theaters, showListing, User, Bookings
 from werkzeug.security import check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from . import db
@@ -8,11 +8,15 @@ import base64
 
 admin_auth = Blueprint('admin_auth', __name__)
 
-def get_role():
-    admin = Admin.query.filter_by().first()
-    for admin in admin:
-        if current_user.name == admin.name:
-            return 'admin'
+def admin_get_role():
+   try: 
+        if current_user:
+            if current_user.role == 'admin':
+                return 'admin'
+        else:
+            return redirect(url_for('admin_auth.login'))
+   except AttributeError:
+       return redirect(url_for('admin_auth.login'))
         
         
 @admin_auth.route('/admin_login', methods=['GET', 'POST'])
@@ -25,7 +29,7 @@ def login():
             if check_password_hash(admin.password, password):
                 flash('Logged in successfully!', category = 'success')
                 login_user(admin)
-                return redirect(url_for('admin_auth.admin_dashboard'))
+                return redirect(url_for('admin_auth.admin_dashboard', admin_id=admin.id))
             else:
                 flash('Incorrect password.', category = 'error')
         else:
@@ -41,18 +45,33 @@ def logout():
 
 @admin_auth.route('/admin_dashboard', methods=['GET', 'POST'])
 def admin_dashboard():
-    admin = Admin.query.first()
-    admin_theater = Theaters.query.filter_by(admin_id=admin.id).all()
+    admin_id = request.args.get("admin_id")
+    admin = Admin.query.filter_by(id=admin_id).first()
+    admin_theater = Theaters.query.filter_by(admin_id=admin_id).all()
+    movies = []
+    total_business=[]
+    for theater in admin_theater:
+        movies.append(showListing.query.filter_by(theater_name=theater.name).first())
+        total_business.append(theater.total_business)
+    bookings = []
+    for movie in movies:
+        bookings.append(Bookings.query.filter_by(show_listing_id=movie.id).first())
     theater_image = Theaters.query.all()
     for theater in admin_theater:
         theater_image = base64.b64encode(theater.image).decode('utf-8')
-    return render_template('admin_dashboard.html', admin=admin, admin_theater=admin_theater, theater_image=theater_image)
+    return render_template('admin_dashboard.html', admin=admin, admin_theater=admin_theater, theater_image=theater_image, 
+                           admin_id=admin_id, movies=movies, bookings=bookings, total_business=total_business)
 
 
 @admin_auth.route('/theater_management', methods=['GET','POST'])
 def theater_management():
-    print(current_user.email)
     admin = Admin.query.filter_by().first()
+    admin_id = request.args.get('admin_id')
+    # if current_user:
+    #     if admin_get_role() == 'admin':
+    #         return redirect(url_for('admin_auth.theater_management'))
+    #     else:
+    #         return redirect(url_for('admin_auth.login'))
     if request.method == 'POST':
         name = request.form.get('name')
         address = request.form.get('address')
@@ -68,18 +87,17 @@ def theater_management():
             db.session.commit()
             db.session.close()
             flash('Theater added', category='success')
-            return(redirect(url_for('admin_auth.admin_dashboard')))
+            return redirect(url_for('admin_auth.admin_dashboard', admin_id=admin_id))
     theater = Theaters.query.filter_by().first()
-    return render_template('theater_management.html', admin=admin, theater=theater)
+    return render_template('theater_management.html', admin=admin, theater=theater, admin_id=admin_id)
 
 
 @admin_auth.route('/delete_theater', methods=['POST', 'GET'])
 def delete_theater():
     admin = Admin.query.filter_by(id=current_user.id).first()
+    admin_id = request.args.get('admin_id')
     theater_name = request.args.get("theater_name")
-    print(theater_name)
     theater = Theaters.query.filter_by(name=theater_name).first()
-    print(theater)
     if request.method=='POST':
     # Get the theater from the database
         if theater:
@@ -93,20 +111,26 @@ def delete_theater():
             db.session.commit()
 
         # Redirect to a page after deletion (e.g., the admin dashboard)
-            return redirect(url_for('admin_auth.admin_dashboard'))
+            return redirect(url_for('admin_auth.admin_dashboard', admin_id=admin.id))
         flash('Theater not found', category='error')
-        return redirect(url_for('admin_auth.admin_dashboard'))
-    return render_template('delete_theater.html', admin=admin, theater=theater)
+        return redirect(url_for('admin_auth.admin_dashboard', admin_id=admin.id))
+    return render_template('delete_theater.html', admin=admin, theater=theater, admin_id=admin_id)
 
-    # Delete the associated movies (if any)
-   
 
+@admin_auth.route('admin_movies', methods=['GET', 'POST'])
+def admin_movies():
+    user=User.query.first()
+    admin_id = request.args.get('admin_id')
+    theater_name = request.args.get('theater_name')
+    admin=Admin.query.filter_by(id=admin_id).first()
+    theater = Theaters.query.filter_by(admin_id=admin_id).first()
+    movies = showListing.query.filter_by(theater_name=theater.name).all()
+    return render_template('admin_movies.html', admin=admin, movies=movies, theater=theater, theater_name=theater_name)
 
 
 @admin_auth.route('/add_movies', methods=['GET', 'POST'])
 def add_movies():
-    print(current_user.email)
-    admin = Admin.query.filter_by().first()
+    admin = Admin.query.filter_by(id = current_user.id).first()
     theater_obj = Theaters.query.filter_by(admin_id=admin.id)
     if admin.is_authenticated:
         admin = Admin.query.filter_by(id=admin.id).first()
@@ -117,12 +141,15 @@ def add_movies():
             price = request.form.get('price')
             screen_no = request.form.get('screen_no')
             theater_name = request.form.get('theater_name').capitalize()
+            total_seats = request.form.get('total_seats')
+            start_date = request.form.get('start_date')
+            end_date = request.form.get('end_date')
             theater = Theaters.query.filter_by(name=theater_name).first()
             if theater:
                 image = request.files['image']
                 image = image.read()
                 new_movie = showListing(show_name=show_name.capitalize(), tags=tags, director=director.capitalize(), theater_name=theater_name.capitalize(),
-                                        image=image, price=price, screen_no=screen_no)
+                                        image=image, price=price, screen_no=screen_no, total_seats=total_seats, start_date=start_date, end_date=end_date)
                 db.session.add(new_movie)
                 flash('Movie added.', category='success')
                 db.session.commit()
@@ -133,6 +160,62 @@ def add_movies():
     else:
         return redirect(url_for('admin_auth.admin_login'))
     return render_template('add_movies.html', admin=admin, theater=theater_obj)
+
+
+@admin_auth.route('/edit_movie', methods=['POST', 'GET'])
+def edit_movie():
+    # admin = Admin.query.filter_by(id=current_user.id).first()
+    movie_id = request.args.get('movie_id')
+    movie = showListing.query.filter_by(id=movie_id).first()
+    admin = Admin.query.filter_by(email=current_user.email).first()
+    # theater_id = request.args.get("theater_id")
+    # theater = Theaters.query.get(theater_id)
+    # movie = showListing.query.filter_by(theater_name=theater.name).first()
+    movie_name = request.form.get('movie_name')
+    tags = request.form.get('tags')
+    director = (request.form.get('director'))
+    price = (request.form.get('screens'))
+    theater_name = (request.form.get('theater_name'))
+    screen_no = (request.form.get('screen_no'))
+    if request.method=='POST':
+        if movie:
+            if movie_name:
+                movie.show_name = movie_name
+            if tags:
+                movie.tags=tags
+            if director:
+                movie.director=director
+            if price:
+                movie.price=price
+            if theater_name:
+                movie.theater_name = theater_name
+            if screen_no:
+                movie.screen_no=screen_no
+        
+        
+            db.session.commit()
+            return redirect(url_for('views.home'))
+        flash('Movie not found', category='error')
+        return redirect(url_for('admin_auth.admin_dashboard'))
+    return render_template('edit_movie.html', admin=admin, movie=movie)
+
+
+@admin_auth.route('/delete_movie', methods=['POST', 'GET'])
+def delete_movie():
+    admin = Admin.query.filter_by(id=current_user.id).first()
+    movie_id = request.args.get('movie_id')
+    movie = showListing.query.filter_by(id=movie_id).first()
+    if request.method=='POST':
+    # Get the theater from the database
+        if movie:
+            db.session.delete(movie)
+            db.session.commit()
+        # Redirect to a page after deletion (e.g., the admin dashboard)
+            return redirect(url_for('views.home'))
+        flash('Movie not found', category='error')
+        return redirect(url_for('admin_auth.admin_dashboard'))
+    return render_template('delete_movie.html', admin=admin, movie=movie)
+
 
 @admin_auth.route('/summary', methods=['GET'])
 def summary():

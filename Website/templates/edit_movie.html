@@ -1,0 +1,33 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+    <div class="modal-body">
+            <form id="editForm" method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="movie_name">Movie Name</label>
+                    <input type="text" class="form-control" id="movie_name" name="movie_name" value="{{ movie.name }}">
+                </div>
+                <div class="form-group">
+                    <label for="tags">Tags</label>
+                    <input type="text" class="form-control" id="tags" name="tags" value="{{ movie.tags }}">
+                </div>
+                <div class="form-group">
+                    <label for="director">Director</label>
+                    <input type="number" class="form-control" id="director" name="director" value="{{ movie.director }}">
+                </div>
+                <div class="form-group">
+                    <label for="price">Price</label>
+                    <input type="number" class="form-control" id="price" name="price" value="{{ movie.price }}">
+                </div>
+                <div class="form-group">
+                    <label for="theater_name">Theater Name</label>
+                    <input type="number" class="form-control" id="theater_name" name="theater_name" value="{{ movie.theater_name }}>
+                </div>
+                <div class="form-group">
+                    <label for="screen_no">Screen Number</label>
+                    <input type="number" class="form-control" id="screen_no" name="screen_no" value="{{ movie.screen_no }}">
+                </div>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </form>
+        </div>
+    {% endblock %}

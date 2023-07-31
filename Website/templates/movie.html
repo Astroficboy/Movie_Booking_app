@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% for movie in movie %}
+  <div class="container my-5">
+    <div class="row">
+      <div class="col-md-6 offset-md-3">
+        <img src="movie_image.jpg" alt="Movie Poster" class="img-fluid rounded mb-4">
+        <div class="text-center">
+          <h1 class="mb-3">{{ movie.show_name }}</h1>
+          <p class="mb-1">Release Date: January 1, 2023</p>
+          <p class="mb-1">Genre: {{ movie.tags }}</p>
+          <p class="mb-1">Director: {{ movie.director }}</p>
+          <p class="mb-3">Theater: {{ movie.theater_name }}</p>
+          <p class="mb-3">Price: {{ movie.price }}</p>
+          <a href="#" class="btn btn-primary">Book Ticket</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Bootstrap JS -->
+{% endfor %}
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+
+
+{% endblock %}

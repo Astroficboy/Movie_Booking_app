@@ -1,0 +1,48 @@
+{% extends 'base_admin.html' %}
+
+{% block content %}
+
+    {% if movies %}
+    <div class="container mt-5">
+        <div class="row">
+            {% for movie in movies %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow">
+                    <img src="{{ url_for('static', filename='assets/Barbie.jpg') }}" alt="{{ movie.show_name }}" class="card-img-top">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ movie.show_name }}</h5>
+                        <p class="card-text">Directed by: {{ movie.director }}</p>
+                        <p class="card-text">Rating: {{ movie.rating }}</p>
+                        <p class="card-text">Price: {{ movie.price }}</p>
+                        <p class="card-text">Theater: {{ movie.theater_name }}</p>
+                        <a href="{{ url_for('admin_auth.delete_movie', movie_id=movie.id, theater_name=movie.theater_name) }}" class="btn btn-primary btn-danger">Delete Show</a>
+                        <a href="{{ url_for('admin_auth.edit_movie', movie_id=movie.id, theater_name=movie.theater_name) }}" class="btn btn-primary btn-danger">Edit Show</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+
+    <div class="row">
+        <div class="col"></div>
+        <div class="col">
+            <p></p>
+            <p></p>
+            <div id="video">
+                <video autoplay controls>
+                    <source src="https://thumbs.gfycat.com/SelfassuredSparklingAlpinegoat-mobile.mp4" type="video/mp4" style="align-items:end;">
+                    
+                </video>
+            </div>
+        </div>
+        <div class="col"></div>
+    </div>
+    
+    
+    {% endif %}
+
+<script src="{{ url_for('static', filename='components/movies.js') }}"></script>
+
+{% endblock %}

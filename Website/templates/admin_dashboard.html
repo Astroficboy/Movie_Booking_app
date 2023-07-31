@@ -9,7 +9,8 @@
             <div class="card shadow">
                 <div class="card-body">
                     <h5 class="card-title">Active Bookings</h5>
-                    <p class="card-text">Total Active Bookings: <span id="activeBookings">0</span></p>
+                    <p class="card-text">Total Active Bookings: <span id="activeBookings">0</span>
+                                        Current Business: <span id="totalBusiness">0</span></p>
                 </div>
             </div>
         </div>
@@ -29,11 +30,11 @@
             <div class="card h-100 shadow">
                 <img src="data:image/jpeg;base64,{{ theater_image }}" alt= "{{ theater.name }}"  class="card-img-top">
                 <div class="card-body" >
-                    <h5 class="card-title">{{ theater.name }}</h5>
+                    <a href="{{ url_for('admin_auth.admin_movies', admin_id=admin.id) }}"><h5 class="card-title">{{ theater.name }}</h5></a>
                     <p class="card-text">Address: {{ theater.address }}</p>
                     <p class="card-text">Screens: {{ theater.screens }}</p>
                     <p class="card-text">Capacity: {{ theater.capacity }}</p>
-                    <a href="{{ url_for('admin_auth.add_movies', theater_id=theater.id) }}" class="btn btn-primary">Add Movies</a>
+                    <a href="{{ url_for('admin_auth.add_movies', theater_id=theater.id, theater_name=theater.name) }}" class="btn btn-primary">Add Movies</a>
                     <a href="{{ url_for ('admin_auth.get_edit_form', theater_id=theater.id) }}"></button><button type="button" class="btn btn-secondary mt-2">Edit</button></a>
                     <a href="{{ url_for ('admin_auth.delete_theater', theater_name=theater.name) }}"><button type="button" class="btn btn-secondary mt-2">Delete</button></a>
                 </div>
@@ -50,12 +51,14 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
     // Simulated data for the number of active bookings and theaters showing movies
-    const activeBookingsCount = 10;
+    const activeBookingsCount = {{ bookings|length }};
     const theatersCount = {{ admin_theater|length }};
+    const totalBusiness = {{ total_business }};
     
     // Update the active bookings and theaters count
     document.getElementById('activeBookings').innerText = activeBookingsCount;
     document.getElementById('totalTheaters').innerText = theatersCount;
+    document.getElementById('totalBusiness').innerText = totalBusiness;
 </script>
 
 

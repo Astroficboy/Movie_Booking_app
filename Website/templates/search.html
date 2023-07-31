@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+  <style>
+    /* Custom styles for the list */
+    li {
+      cursor: pointer;
+    }
+    li:hover {
+      background-color: #f5f5f5;
+    }
+  </style>
+{% for movie in movies %}
+  <div class="container mt-4">
+    <ul class="list-group">
+        <a href="{{ url_for ('views.movie', movie_name= movie.show_name ) }}">
+            <li class="list-group-item">{{ movie.show_name }} - {{ movie.price }} - {{ movie.theater_name }}</li>
+        </a>
+    </ul>
+  </div>
+{% endfor %}
+
+
+{% endblock %}

@@ -18,16 +18,24 @@
                     <input class="form-control" id="director" name="director" placeholder="Christopher Nolan">
                 </div>
                 <div class="form-group">
-                    <label for="theater_name">Theater Name</label>
-                    <input class="form-control" id="theater_name" name="theater_name" placeholder="PVR Cinemas">
-                </div>
-                <div class="form-group">
                     <label for="screen_no">Screen Number</label>
                     <input class="form-control" id="screen_no" name="screen_no" placeholder="5">
                 </div>
                 <div class="form-group">
+                    <label for="total_seats">Total seats</label>
+                    <input class="form-control" id="total_seats" name="total_seats" placeholder="5">
+                </div>
+                <div class="form-group">
                     <label for="price">Price</label>
                     <input class="form-control" id="price" name="price" placeholder="300">
+                </div>
+                <div class="form-group">
+                    <label for="start_date">Start Date</label>
+                    <input type="datetime-local" class="form-control" id="start_date" name="start_date">
+                </div>
+                <div class="form-group">
+                    <label for="end_date">End Date</label>
+                    <input type="datetime-local" class="form-control" id="end_date" name="end_date">
                 </div>
                 <div class="form-group">
                     <label for="image">Movie Poster</label>
@@ -39,6 +47,7 @@
         </div>
     </form>
 </div>
+
 
 
     `

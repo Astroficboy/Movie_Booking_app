@@ -74,6 +74,9 @@ class showListing(db.Model):
     number_of_bookings = db.Column(db.Integer)
     number_of_theaters = db.Column(db.Integer)
     image = db.Column(db.BLOB)
+    start_date = db.Column(db.DateTime)
+    end_date = db.Column(db.DateTime)
+    no_seats = db.Column(db.Integer)
 
 
 

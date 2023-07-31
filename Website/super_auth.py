@@ -13,6 +13,7 @@ super_auth = Blueprint('super_auth', __name__)
 @super_auth.route('/super_login', methods=['GET', 'POST'])
 def super_login():
     super_obj = Super.query.filter_by().first()
+    admin_obj = Admin.query.first()
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('password')
@@ -22,9 +23,8 @@ def super_login():
             if check_password_hash(super_user.password, password):
                 flash('Logged in successfully!', category = 'success')
                 login_user(super_user)
-                return redirect(url_for('super_auth.admin_registration', super_value=super_obj))
-            else:
-                flash('Incorrect password.', category = 'error')
+                return redirect(url_for('super_auth.admin_registration'))
+            flash('Incorrect password.', category = 'error')
         else:
             flash('Email does not exists.', category = 'error')
     return render_template('super_login.html', super_value=super_obj)
@@ -38,15 +38,21 @@ def logout():
 
 
 def super_get_role():
-    if current_user.role == 'super':
-        return 'super'
-    else:
-        return redirect(url_for('super_auth.super_login'))
+   try: 
+        if current_user:
+            if current_user.role == 'super':
+                return 'super'
+        else:
+            return redirect(url_for('super_auth.super_login'))
+   except AttributeError:
+       return redirect(url_for('super_auth.super_login'))
     
 
 @super_auth.route('/admin_registration', methods=['GET', 'POST'])
 # @super_required
 def admin_registration():
+    admin = Admin.query.first()
+    super_value = Super.query.first()
     role = super_get_role()
     if role == 'super':
         if request.method == 'POST':
@@ -72,7 +78,8 @@ def admin_registration():
                 db.session.commit()
                 login_user(new_admin)
                 flash('Account created.', category = 'success')
-                return redirect(url_for('admin_auth.admin_dashboard'))
-    # else:
-    #     return redirect(url_for('super_auth.super_login'))
-    return render_template('register_admin.html', admin = current_user, super_value=current_user)
+                
+                # return redirect(url_for('admin_auth.admin_dashboard'))
+    else:
+        return redirect(url_for('super_auth.super_login'))
+    return render_template('register_admin.html', admin = current_user, super_value=super_value)
