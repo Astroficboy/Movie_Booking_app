@@ -51,7 +51,7 @@
                   <a class="nav-link" href="{{ url_for ('admin_auth.theater_management', admin_id=admin_id) }}">Add Theater</a>
               </li>
               <li class="nav-item">
-                  <a class="nav-link" href="/summary">Summary</a>
+                  <a class="nav-link" href="{{ url_for('admin_auth.summary', admin_id=admin.id) }}">Summary</a>
               </li>
               {% else %}
               <li>

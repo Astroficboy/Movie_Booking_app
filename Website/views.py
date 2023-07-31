@@ -9,6 +9,7 @@ import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from apscheduler.schedulers.background import BackgroundScheduler
+import subprocess
 
 views = Blueprint('views', __name__)
 
@@ -63,6 +64,7 @@ def booking():
     SMTP_SERVER_PORT = 1025
     SENDER_ADDRESS = "movie@booking.com"
     SENDER_PASSWORD = ''
+    
     movie_id = request.args.get('movie_id')
     admin = Admin.query.first()
     movies = showListing.query.filter_by(id=movie_id).first()
@@ -91,6 +93,7 @@ def booking():
             theater.total_business += (int(seats)*movies.price)
         if movies.no_seats:
             if seats < movies.no_seats:
+                movies.number_of_bookings += seats
                 db.session.add(new_booking)
                 db.session.commit()
             flash('No Seats available.', category='error')
@@ -150,6 +153,9 @@ def has_booked():
     SMTP_SERVER_PORT = 1025
     SENDER_ADDRESS = "movie@booking.com"
     SENDER_PASSWORD = '123'
+    mailhog_path = r'F:\Pranav project\from scratch\MailHog_windows_amd64.exe'
+    smtp_server = [ mailhog_path ]
+    subprocess.Popen(smtp_server)
     bookings = Bookings.query.all()
     booking_user_ids = []
     users = User.query.all()

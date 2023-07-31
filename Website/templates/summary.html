@@ -2,8 +2,9 @@
 
 {% block content %}
 
+{% for movie in movies %}
 <div class="container mt-5">
-    <h2>Theater Owner Summary</h2>
+    <h2>Business Summary</h2>
 
     <!-- Number of Bookings -->
     <div class="card mt-4">
@@ -11,9 +12,7 @@
             Number of Bookings
         </div>
         <div class="card-body">
-            <p>Total Bookings: 100</p>
-            <p>Bookings This Month: 20</p>
-            <p>Bookings Today: 5</p>
+            <p>{{ movie.show_name }} <span>Total Bookings: {{ movie.number_of_bookings }}</span></p>
         </div>
     </div>
 
@@ -23,10 +22,14 @@
             Highest Selling Movie
         </div>
         <div class="card-body">
-            <p>Movie Name: Avengers: Endgame</p>
-            <p>Total Tickets Sold: 50</p>
-            <p>Revenue: $500</p>
+            <p>{{ movie_name }}</p>
+            <p>Revenue: {{ highest_sale }}</p>
         </div>
+    </div>
+
+    <h2>Total Business for Each Theater (Bar Chart)</h2>
+    <div class="chart-container">
+        <canvas id="businessChart"></canvas>
     </div>
 
     <!-- Revenue Chart -->
@@ -39,10 +42,42 @@
         </div>
     </div>
 </div>
+{% endfor %}
 
 <!-- JavaScript -->
 <script>
     // Sample data for Revenue Chart (replace with your actual data)
+    
+    var chartData = {
+        labels: [],
+        datasets: [{
+            label: 'Total Business',
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgba(54, 162, 235, 1)',
+            borderWidth: 1,
+            data: []
+        }]
+    };
+
+    {% for theater in theaters %}
+        chartData.labels.push("{{ theater.name }}");
+        chartData.datasets[0].data.push({{ theater.total_business }});
+    {% endfor %}
+
+    // Create the bar chart
+    var chart = document.getElementById('businessChart').getContext('2d');
+    var businessChart = new Chart(chart, {
+        type: 'bar',
+        data: chartData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
     const revenueData = {
         labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         datasets: [{
@@ -70,6 +105,7 @@
             }
         }
     });
+    
 </script>
 
 

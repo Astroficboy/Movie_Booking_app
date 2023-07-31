@@ -4,6 +4,7 @@ from werkzeug.security import check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from . import db
 import base64
+# import weasyprint
 
 
 admin_auth = Blueprint('admin_auth', __name__)
@@ -219,13 +220,33 @@ def delete_movie():
 
 @admin_auth.route('/summary', methods=['GET'])
 def summary():
-    admin = Admin.query.filter_by(email=current_user.email).first()
-    theater_obj = Theaters.query.filter_by(admin_id=admin.id)
+    admin_id = request.args.get('admin_id')
+    admin = Admin.query.filter_by(id=admin_id).first()
+    theaters = Theaters.query.filter_by(admin_id=admin_id).all()
+    
+    movies = []
+    for theater in theaters:
+        movies.append(showListing.query.filter_by(theater_name=theater.name).first())
+        
+    business_from_each_movie = {}
+    for movie in movies:
+        business = movie.price * movie.number_of_bookings
+        business_from_each_movie[movie.show_name] = business_from_each_movie.get(movie.show_name, 0) + business
+    print(business_from_each_movie)
+    
+    highest_sale = 0
+    movie_name = ''
+    for movie_name, sale in business_from_each_movie.items():
+        if sale > highest_sale:
+            highest_sale = sale
+            movie_name = movie_name
+    
     if admin.is_authenticated:
         admin = Admin.query.filter_by(id=admin.id).first()
     else:
         return redirect(url_for('admin_auth.admin_login'))
-    return render_template('summary.html', admin=admin)
+    return render_template('summary.html', admin_id=admin_id, admin=admin, theaters=theaters, movies=movies,
+                           business_from_each_movie=business_from_each_movie, highest_sale=highest_sale, movie_name=movie_name)
 
 
 # Route to return the edit form HTML for a specific theater
@@ -253,22 +274,3 @@ def get_edit_form():
     
     return flash('Theater not found',category='error')
 #    return render_template('edit_form.html', theater=theater, admin=admin)
-
-# @admin_auth.route('/update_theater/<theater_id>', methods=['POST'])
-# def update_theater(theater_id):
-#     admin = Admin.query.filter_by(email=current_user.email).first()
-#     theater = Theaters.query.get(theater_id)
-#     if theater:
-#         # Update theater details based on the form data submitted
-#         name = request.form.get('name')
-#         address = request.form.get('address')
-#         capacity = int(request.form.get('capacity'))
-#         screens = int(request.form.get('screens'))
-#         update_theater = theater(name=name, address=address, capacity=capacity, screens=screens)
-#         db.session.commit(update_theater)
-
-#         # Return a success message or handle the update success
-#         return jsonify({'message': 'Theater details updated successfully'})
-#     else:
-#         # Return an error message or handle the case when the theater is not found
-#         return jsonify({'error': 'Theater not found'}, admin=admin)
