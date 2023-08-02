@@ -11,6 +11,8 @@
       background-color: #f5f5f5;
     }
   </style>
+
+{% if movie.show_name %}
 {% for movie in movies %}
   <div class="container mt-4">
     <ul class="list-group">
@@ -19,7 +21,35 @@
         </a>
     </ul>
   </div>
+  {% endfor %}
+
+  {% elif theater.address == query %}
+  {% for theater in theaters %}
+  <div class="container mt-4">
+    <ul class="list-group">
+        <a href="{{ url_for ('views.movie', movie_name= movie.show_name ) }}">
+            <li class="list-group-item">{{ movie.show_name }} - {{ movie.price }} - {{ movie.theater_name }}</li>
+        </a>
+    </ul>
+  </div>
 {% endfor %}
+{% else %}
+<div class="row">
+  <div class="col"></div>
+  <div class="col">
+      <p></p>
+      <p></p>
+      <div id="video">
+          <video autoplay controls>
+              <source src="https://thumbs.gfycat.com/SelfassuredSparklingAlpinegoat-mobile.mp4" type="video/mp4" style="align-items:end;">
+              
+          </video>
+      </div>
+  </div>
+  <div class="col"></div>
+</div>
+{% endif %}
+
 
 
 {% endblock %}

@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Report</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <title>PDF Report</title>
     <!-- Add any necessary CSS styles here -->
     <style>
         /* Add your custom CSS styles here */
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
         }
         h1, h2 {
             margin-bottom: 20px;
@@ -14,6 +16,7 @@
         table {
             width: 100%;
             border-collapse: collapse;
+            margin-bottom: 20px;
         }
         th, td {
             border: 1px solid #ddd;
@@ -24,8 +27,13 @@
         }
         .chart-container {
             width: 100%;
+            max-width: 800px;   
             height: 400px;
-            margin-top: 30px;
+            margin: 30px auto;
+        }
+        .chart-image {
+            max-width: 100%;
+            height: auto;
         }
     </style>
 </head>
@@ -35,37 +43,29 @@
     <h2>Number of Bookings in Each Theater</h2>
     <table>
         <tr>
-            <th>Theater Name</th>
+            <th>Movie Name</th>
             <th>Number of Bookings</th>
         </tr>
-        <!-- Use Jinja or JavaScript to populate the data here -->
+        {% for movie in movies %}
         <tr>
-            <td>Theater 1</td>
-            <td>10</td>
+            <td>{{ movie.show_name }}</td>
+            <td>{{ movie.number_of_bookings }}</td>
         </tr>
-        <tr>
-            <td>Theater 2</td>
-            <td>15</td>
-        </tr>
-        <!-- Add more rows as needed -->
+        {% endfor %}
     </table>
-
+        
     <h2>Total Business Done in Each Theater</h2>
     <table>
         <tr>
             <th>Theater Name</th>
             <th>Total Business</th>
         </tr>
-        <!-- Use Jinja or JavaScript to populate the data here -->
+        {% for theater in theaters %}
         <tr>
-            <td>Theater 1</td>
-            <td>$1000</td>
+            <td>{{ theater.name }}</td>
+            <td>{{ theater.total_business }}</td>
         </tr>
-        <tr>
-            <td>Theater 2</td>
-            <td>$1500</td>
-        </tr>
-        <!-- Add more rows as needed -->
+        {% endfor %}
     </table>
 
     <!-- Add sections for other data points (e.g., most business generating movies, popular theaters, popular movies, etc.) -->
@@ -80,16 +80,20 @@
     <script>
         // Sample data for the bar chart (replace with actual data)
         var chartData = {
-            labels: ['Theater 1', 'Theater 2', 'Theater 3'],
+            labels: [],
             datasets: [{
                 label: 'Total Business',
                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 borderWidth: 1,
-                data: [1000, 1500, 800]
+                data: []
             }]
         };
 
+        {% for theater in theaters %}
+        chartData.labels.push("{{ theater.name }}");
+        chartData.datasets[0].data.push("{{ theater.total_business }}");
+        {% endfor %}
         // Create the bar chart
         var ctx = document.getElementById('businessChart').getContext('2d');
         var businessChart = new Chart(ctx, {
@@ -98,12 +102,20 @@
             options: {
                 scales: {
                     y: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return 'Rs. ' + value;
+                            }
+                        }
                     }
                 }
             }
         });
     </script>
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
+

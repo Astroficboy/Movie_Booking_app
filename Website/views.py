@@ -10,6 +10,7 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from apscheduler.schedulers.background import BackgroundScheduler
 import subprocess
+from Website import tasks
 
 views = Blueprint('views', __name__)
 
@@ -112,11 +113,12 @@ def search():
     query = request.args.get("query")
     print("q", query)
     movies = showListing.query.all()
+    theater = Theaters.query.all()
     if query:
         movies = showListing.query.filter((showListing.show_name.like(query + '%'))).all()
+        theater = Theaters.query.filter((Theaters.address.like(query + '%'))).all()
     print(movies)
     if request.method=='POST':
-        
         if current_user:
             if get_role() == 'normal':
                 user = User.query.filter_by(id=current_user.id).first()
@@ -126,7 +128,7 @@ def search():
                 super = Super.query.first()
         else:
             return redirect(url_for('auth.sign_up'))
-    return render_template('search.html', user=user, admin=admin, super=super, movies=movies, query=query)
+    return render_template('search.html', user=user, admin=admin, super=super, movies=movies, query=query, theaters=theater)
 
 
 @views.route('/movie', methods=['GET', 'POST'])
@@ -182,3 +184,8 @@ def has_booked():
             scheduler.add_job(s.send_message, trigger='cron', hour=17, minute=0, kwargs=({'msg':msg}))  # 5:00 PM
             scheduler.start()
             print("Scheduler started")
+            
+@views.route("/hello", methods=['GET', 'POST'])
+def hello():
+    job = tasks.hello.delay()
+    return str(job), 200

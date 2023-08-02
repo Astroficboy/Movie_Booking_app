@@ -44,6 +44,9 @@
 </div>
 {% endfor %}
 
+<div class="container mt-4">
+    <a href="{{ url_for('admin_auth.report', admin_id=admin_id)}}" class="btn btn-primary">Generate Report</a>
+</div>
 <!-- JavaScript -->
 <script>
     // Sample data for Revenue Chart (replace with your actual data)

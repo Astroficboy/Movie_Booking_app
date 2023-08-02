@@ -3,11 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path, getenv
 from flask_login import LoginManager, login_user
 from werkzeug.security import generate_password_hash
+from Website import workers
 
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
+celery=None
 
 def create_default_user():
     from .models import Super
@@ -16,7 +18,6 @@ def create_default_user():
         super_user = Super(name='super', email='super@movies.com', password=generate_password_hash('super123', method='sha256'), role='super')
         db.session.add(super_user)
         db.session.commit()
-        
         
 
 def create_app():
@@ -44,12 +45,14 @@ def create_app():
     login_manager = LoginManager()
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
-
+    
+    
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(id) or Super.query.get(id) or Admin.query.get(id)
-    return app
+    return app, celery
 
+    
 
 def create_database(app):
     if not path.exists('website/instance/' + DB_NAME):

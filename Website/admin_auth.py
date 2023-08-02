@@ -1,10 +1,10 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, Response
 from .models import Admin, Theaters, showListing, User, Bookings
 from werkzeug.security import check_password_hash
 from flask_login import login_user, login_required, logout_user, current_user
 from . import db
 import base64
-# import weasyprint
+import weasyprint
 
 
 admin_auth = Blueprint('admin_auth', __name__)
@@ -247,6 +247,34 @@ def summary():
         return redirect(url_for('admin_auth.admin_login'))
     return render_template('summary.html', admin_id=admin_id, admin=admin, theaters=theaters, movies=movies,
                            business_from_each_movie=business_from_each_movie, highest_sale=highest_sale, movie_name=movie_name)
+    
+    
+@admin_auth.route('/report', methods=['GET', 'POST'])
+def report():
+    admin_id = request.args.get('admin_id')
+    admin = Admin.query.filter_by(id=admin_id).first()
+    theaters = Theaters.query.filter_by(admin_id=admin_id).all()
+    movies = []
+    for theater in theaters:
+        movies.append(showListing.query.filter_by(theater_name=theater.name).first())
+        
+    html_content = render_template('report.html', admin=admin, admin_id=admin_id, theaters=theaters, movies=movies)
+    # html_template_url = "F:\Pranav project\from scratch\Website\templates\report.html"
+
+    report_html = weasyprint.HTML(string=html_content)
+
+    # Generate the PDF in memory
+    pdf_bytes = report_html.write_pdf(target=None)
+
+    # Specify the filename for the PDF (if needed)
+    pdf_filename = 'report.pdf'
+
+    # Return the PDF as a response with appropriate headers for PDF content
+    response = Response(pdf_bytes, content_type='application/pdf')
+    response.headers['Content-Disposition'] = f'inline; filename="{pdf_filename}"'
+    return response
+
+        
 
 
 # Route to return the edit form HTML for a specific theater
