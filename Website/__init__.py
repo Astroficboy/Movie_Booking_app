@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from os import path, getenv
 from flask_login import LoginManager, login_user
 from werkzeug.security import generate_password_hash
-from Website import workers
+from celery import Celery
 
 
 db = SQLAlchemy()
@@ -21,11 +21,18 @@ def create_default_user():
         
 
 def create_app():
+    
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'iitm'
     app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{DB_NAME}'
     db.init_app(app)
 
+    # Set the Celery broker URL
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+
+    # Set the result backend for Celery
+    app.config['RESULT_BACKEND'] = 'redis://localhost'
+    
     from .views import views
     from .auth import auth
     from .admin_auth import admin_auth
@@ -50,9 +57,13 @@ def create_app():
     @login_manager.user_loader
     def load_user(id):
         return User.query.get(id) or Super.query.get(id) or Admin.query.get(id)
-    return app, celery
+    return app
 
-    
+# def make_Celery(app_name=__name__):
+#     readis_uri = "redis://localhost:6379"
+#     return Celery(app_name, backend=readis_uri, broker=readis_uri)
+
+# celery=make_celery()
 
 def create_database(app):
     if not path.exists('website/instance/' + DB_NAME):

@@ -11,7 +11,6 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
-    
     admin = Admin.query.first()
     if request.method == 'POST':
         email = request.form.get('email')
@@ -25,7 +24,8 @@ def login():
             else:
                 flash('Incorrect password.', category = 'error')
         else:
-            flash('Email does not exists.', category = 'error')
+            flash('Email does not exists. Please sign up.', category = 'error')
+            return redirect( url_for('auth.sign_up'))
     return render_template('login.html', user = current_user, admin=admin)
 
 

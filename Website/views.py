@@ -12,6 +12,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import subprocess
 from Website import tasks
 from Website.tasks import export_theatre_details_to_csv
+from Website.tasks import hello
 
 views = Blueprint('views', __name__)
 
@@ -37,11 +38,13 @@ def get_role():
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
+    print(hello.apply_async(countdown=8).wait())
     user=None
     admin=None
     super=None
     query = request.form.get("search")
     print("q", query)
+    
     movies = showListing.query.all()
     if query:
         movies = showListing.query.filter((showListing.show_name.like(query + '%'))).all()
@@ -79,14 +82,16 @@ def booking():
         new_booking = Bookings(show_listing_id=movie_id, user_id=user_id, number_of_seats=seats, total_amount=((int(seats)*movies.price)))
         theater = Theaters.query.filter_by(name=movies.theater_name).first()
         
-        msg = MIMEMultipart()
-        msg["FROM"]=SENDER_ADDRESS
-        msg["To"]=user_email.email
-        msg["Subject"]= "Your booking for " + movies.show_name + " at " + movies.theater_name + " is confirmed. The amount of booking for " + str(seats) + " seats " + " is " + str(int(seats)*movies.price) +"."
-        s=smtplib.SMTP(host=SMTP_SERVER_HOST, port=SMTP_SERVER_PORT)
-        s.login(SENDER_ADDRESS, SENDER_PASSWORD)
-        s.send_message(msg)
-        s.quit()
+        if user_email:
+            msg = MIMEMultipart()
+            msg["FROM"]=SENDER_ADDRESS
+            msg["To"]=user_email.email
+            msg["Subject"]= "Your booking for " + movies.show_name + " at " + movies.theater_name + " is confirmed. The amount of booking for " + str(seats) + " seats " + " is " + str(int(seats)*movies.price) +"."
+            s=smtplib.SMTP(host=SMTP_SERVER_HOST, port=SMTP_SERVER_PORT)
+            s.login(SENDER_ADDRESS, SENDER_PASSWORD)
+            s.send_message(msg)
+        else:
+            return redirect( url_for('auth.login'))
         
         if theater.total_business:
             theater.total_business += (int(seats)*movies.price)

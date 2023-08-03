@@ -1,14 +1,19 @@
 from email.mime.multipart import MIMEMultipart
 import smtplib
 import subprocess
-from Website.celery_config import celery
-from flask import current_app as app
+from celery import Celery
 from .models import User, Admin, showListing, Theaters, Bookings
 from apscheduler.schedulers.background import BackgroundScheduler
 from email.mime.text import MIMEText
 from datetime import datetime, timedelta
 from Website.models import Theaters, showListing, Bookings
 import csv
+
+celery = Celery("Application jobs")
+
+@celery.task()
+def hello():
+    return "hello"
 
 @celery.task()
 def export_theatre_details_to_csv(theatre_id):
