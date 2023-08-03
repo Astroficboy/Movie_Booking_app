@@ -11,6 +11,7 @@ from email.mime.multipart import MIMEMultipart
 from apscheduler.schedulers.background import BackgroundScheduler
 import subprocess
 from Website import tasks
+from Website.tasks import export_theatre_details_to_csv
 
 views = Blueprint('views', __name__)
 
@@ -131,6 +132,19 @@ def search():
     return render_template('search.html', user=user, admin=admin, super=super, movies=movies, query=query, theaters=theater)
 
 
+@views.route('/dashboard', methods=['GET', 'POST'])
+def dashboard():
+    if request.method == 'POST':
+        theater_id = request.form.get('theatre_id')
+        if theater_id:
+            task = export_theatre_details_to_csv(theater_id)
+            flash("CSV export job is running. You will receive an alert when it's done.")
+        else:
+            flash("Please select a theatre.")
+    theater = Theaters.query.all()
+    return render_template('dashboard.html', theater=theater)
+
+
 @views.route('/movie', methods=['GET', 'POST'])
 def movie():
     user=None
@@ -148,44 +162,4 @@ def movie():
     else:   
         return redirect(url_for('auth.sign_up'))
     return render_template('movie.html', movie=movie)
-
-
-def has_booked():
-    SMTP_SERVER_HOST = "localhost"
-    SMTP_SERVER_PORT = 1025
-    SENDER_ADDRESS = "movie@booking.com"
-    SENDER_PASSWORD = '123'
-    mailhog_path = r'F:\Pranav project\from scratch\MailHog_windows_amd64.exe'
-    smtp_server = [ mailhog_path ]
-    subprocess.Popen(smtp_server)
-    bookings = Bookings.query.all()
-    booking_user_ids = []
-    users = User.query.all()
-    msg = MIMEMultipart()
-    msg["FROM"]=SENDER_ADDRESS
-    msg["To"]= []
-    msg["Subject"]= "You worked hard for the past few days, may be now it's time for some entertainment. Visit http://127.0.0.1:5000/"
-    s=smtplib.SMTP(host=SMTP_SERVER_HOST, port=SMTP_SERVER_PORT)
-    s.login(SENDER_ADDRESS, SENDER_PASSWORD)
-    
-    
-    
-    for booking in bookings:
-        booking_user_ids.append(booking.user_id)
-    for user in users:
-        if user.id not in booking_user_ids:
-            msg["To"].append(user.email)
             
-    print(msg["To"])
-    if len(msg["To"])>0:
-        for mail in msg["To"]:
-            msg["To"] = mail
-            scheduler = BackgroundScheduler(daemon=True)
-            scheduler.add_job(s.send_message, trigger='cron', hour=17, minute=0, kwargs=({'msg':msg}))  # 5:00 PM
-            scheduler.start()
-            print("Scheduler started")
-            
-@views.route("/hello", methods=['GET', 'POST'])
-def hello():
-    job = tasks.hello.delay()
-    return str(job), 200

@@ -1,25 +1,21 @@
 from Website import create_app, create_default_user
-from Website.views import has_booked
 from Website.workers import celery
-from Website.tasks import hello, check_task_status
+from Website.tasks import has_booked, check_task_status, send_report
 from Website.celery_config import celery, make_celery
-# from flask import current_app as app
+import redis
 
 app, celery = create_app()
-app.config['CELERY_BROKER_URL'] = "redis://localhost:6379/1"
-app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6379/2"
+app.config['CELERY_BROKER_URL'] = "redis://localhost:6380"
+app.config['CELERY_RESULT_BACKEND'] = "redis://localhost:6380"
 celery = make_celery(app)
 
 if  __name__ == '__main__':
     with app.app_context():
+        r = redis.StrictRedis(host='localhost', port=6380, db=0)
+        r.ping()
         has_booked()
-        
-        task = hello.apply_async()
-        task_id = task.id
-
-        # Check the status and result of the task using the task ID
-        check_task_status(task_id)
+        send_report("Website/templates/report.html")
         create_default_user()
-    print("super user created")
+        print("super user created")
     app.run(debug = True)
 
