@@ -9,7 +9,7 @@ from datetime import datetime, timedelta
 from Website.models import Theaters, showListing, Bookings
 import csv
 
-celery = Celery("Application jobs")
+celery = Celery()
 
 @celery.task()
 def hello():
@@ -43,7 +43,7 @@ def export_theatre_details_to_csv(theatre_id):
 
 @celery.task()
 def has_booked():
-    SMTP_SERVER_HOST = "localhost"
+    SMTP_SERVER_HOST = "127.0.0.1"
     SMTP_SERVER_PORT = 1025
     SENDER_ADDRESS = "movie@booking.com"
     SENDER_PASSWORD = '123'
@@ -59,7 +59,6 @@ def has_booked():
     msg["Subject"]= "You worked hard for the past few days, may be now it's time for some entertainment. Visit http://127.0.0.1:5000/"
     s=smtplib.SMTP(host=SMTP_SERVER_HOST, port=SMTP_SERVER_PORT)
     s.login(SENDER_ADDRESS, SENDER_PASSWORD)
-    
     
     
     for booking in bookings:
@@ -85,7 +84,7 @@ def has_booked():
 @celery.task()
 def send_report(html_file_path):
     admin = Admin.query.all()
-    SMTP_SERVER_HOST = "localhost"
+    SMTP_SERVER_HOST = "127.0.0.1"
     SMTP_SERVER_PORT = 1025
     SENDER_ADDRESS = "movie@booking.com"
     SENDER_PASSWORD = '123'

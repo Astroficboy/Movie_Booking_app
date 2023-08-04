@@ -5,7 +5,6 @@ from flask_login import LoginManager, login_user
 from werkzeug.security import generate_password_hash
 from celery import Celery
 
-
 db = SQLAlchemy()
 DB_NAME = "database.db"
 
@@ -28,7 +27,7 @@ def create_app():
     db.init_app(app)
 
     # Set the Celery broker URL
-    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+    app.config['CELERY_BROKER_URL'] = 'redis://127.0.0.1:6379'
 
     # Set the result backend for Celery
     app.config['RESULT_BACKEND'] = 'redis://localhost'

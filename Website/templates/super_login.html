@@ -2,40 +2,8 @@
 {% block title %}Super_Login{% endblock %}
 
 {% block content %}
-<form method="POST" class="container mt-5 p-4 rounded shadow">
-    <h3 class="text-center mb-4">Super Login</h3>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="email">Email address</label>  
-                <input 
-                    type="email"  
-                    class="form-control" 
-                    id="email" 
-                    name="email" 
-                    placeholder="Enter email"
-                    required
-                />
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="form-group">
-                <label for="password">Password</label>  
-                <input 
-                    type="password"  
-                    class="form-control" 
-                    id="password" 
-                    name="password" 
-                    placeholder="Enter password"
-                    required
-                />
-            </div>
-        </div>
-    </div>
-    <div class="row justify-content-center">
-        <div class="col-sm-6">
-            <button type="submit" class="btn btn-primary btn-block">Login</button>
-        </div>
-    </div>
-</form>
+<div id="auth">
+    <super-login></super-login>
+</div>
+<script src="{{ url_for('static', filename='components/auth.js') }}"></script>
 {% endblock %}

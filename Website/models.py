@@ -3,6 +3,13 @@ from flask_login import UserMixin
 from sqlalchemy.sql import func
 from sqlalchemy import Enum, BLOB
 import enum
+import json
+
+class BytesJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, bytes):
+            return obj.decode('latin-1')  # Decode using 'latin-1'
+        return super().default(obj)
 
 class Super(db.Model, UserMixin):
     __tablename__ = 'super'
@@ -77,6 +84,26 @@ class showListing(db.Model):
     start_date = db.Column(db.DateTime)
     end_date = db.Column(db.DateTime)
     no_seats = db.Column(db.Integer)
+    def to_dict(self):
+        data = {
+            'id': self.id,
+            'show_name': self.show_name,
+            'tags':self.tags,
+            'director': self.director,
+            'rating': self.rating,
+            'price': self.price,
+            'theater_name': self.theater_name,
+            'screen_no': self.screen_no,
+            'number_of_bookings':self.number_of_bookings,
+            'number_of_theaters':self.number_of_theaters,
+            'image':self.image,
+            'start_date':self.start_date,
+            'end_date':self.end_date,
+            'no_seats':self.no_seats
+            
+            # Add other fields as needed
+        }
+        return data
 
 
 

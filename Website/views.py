@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify
 from flask_login import login_required, current_user
 from .models import User, Admin, showListing, Theaters, Bookings, Super
 import os
@@ -38,12 +38,12 @@ def get_role():
 
 @views.route('/', methods=['GET', 'POST'])
 def home():
-    print(hello.apply_async(countdown=8).wait())
+    result = hello.apply_async(countdown=8)
+    print(result.get())
     user=None
     admin=None
     super=None
     query = request.form.get("search")
-    print("q", query)
     
     movies = showListing.query.all()
     if query:

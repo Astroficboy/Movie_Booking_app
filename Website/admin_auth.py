@@ -160,7 +160,7 @@ def add_movies():
             return redirect(url_for('admin_auth.theater_management'))
     else:
         return redirect(url_for('admin_auth.admin_login'))
-    return render_template('add_movies.html', admin=admin, theater=theater_obj)
+    return jsonify({"message": "Movie added successfully"})
 
 
 @admin_auth.route('/edit_movie', methods=['POST', 'GET'])
